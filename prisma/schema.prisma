@@ -1,0 +1,95 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+model Users {
+  id        Int       @id @default(autoincrement())
+  email     String    @unique
+  name      String    @default("User")
+  number    String    @default("+1 234 567 8900") // Make sure this field is here
+  address   String    @default("123 Eco Street, Green City, 12345")
+  createdAt DateTime  @default(now())
+  Reports   Report[]  @relation("UserReports")
+  CollectedReports Report[]  @relation("CollectedBy")
+  Rewards   Reward[]
+  CollectedWastes CollectedWaste[]
+  Notifications Notifications[]
+  Transactions Transactions[]
+  Sessions   Session[]
+}
+
+
+model Session {
+  id           Int       @id @default(autoincrement())
+  sessionToken String    @unique
+  userId       Int
+  expires      DateTime
+  user         Users     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+
+model Report {
+  id                 Int       @id @default(autoincrement())
+  userId             Int
+  location           String
+  wasteType          String
+  amount             String
+  imageUrl           String?
+  verificationResult Json?
+  status             String    @default("pending")
+  createdAt          DateTime  @default(now())
+  collectorId        Int?
+  collector          Users?    @relation("CollectedBy", fields: [collectorId], references: [id])
+  user               Users     @relation("UserReports", fields: [userId], references: [id])
+  CollectedWastes    CollectedWaste[]
+}
+
+model Reward {
+  id             Int      @id @default(autoincrement())
+  userId         Int
+  points         Int      @default(0)
+  level          Int      @default(1)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  isAvailable    Boolean  @default(true)
+  description    String?
+  name           String
+  collectionInfo String
+  user           Users    @relation(fields: [userId], references: [id])
+}
+
+model CollectedWaste {
+  id             Int      @id @default(autoincrement())
+  reportId       Int
+  collectorId    Int
+  collectionDate DateTime
+  status         String   @default("collected")
+  report         Report   @relation(fields: [reportId], references: [id])
+  collector      Users    @relation(fields: [collectorId], references: [id])
+}
+
+model Notifications {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  message   String
+  type      String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  user      Users    @relation(fields: [userId], references: [id])
+}
+
+model Transactions {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  type        String   // 'earned' or 'redeemed'
+  amount      Int
+  description String
+  date        DateTime @default(now())
+  user        Users    @relation(fields: [userId], references: [id])
+}
