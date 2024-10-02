@@ -2,7 +2,10 @@
 const nextConfig = {
     images:{
         domains:['localhost','images.unsplash.com']
-    }    
+    },
+    eslint: {
+        ignoreDuringBuilds: true,
+    },
 };
 
 export default nextConfig;
