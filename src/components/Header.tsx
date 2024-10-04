@@ -1,11 +1,14 @@
-import React, { useState, useEffect } from "react";
+'use client';
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { usePathname } from 'next/navigation';
 import { useSession, signIn, signOut } from 'next-auth/react';
 import { Button } from "@/components/ui/button";
-import { Menu, Coins, Leaf, Search, Bell, User, ChevronDown, LogIn, Loader as Spinner, X } from "lucide-react";
+import { Menu, Coins, Leaf, Search, Bell, User, ChevronDown, LogIn, Loader as Spinner } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
+import useSWR from 'swr';
 
 interface Notification {
   id: number;
@@ -20,18 +23,17 @@ interface UserData {
 
 interface HeaderProps {
   onMenuClick: () => void;
-  totalEarnings: number; // Add this line to include the totalEarnings prop
 }
 
-export default function Header({ onMenuClick, totalEarnings }: Readonly<HeaderProps>) {
+const fetcher = (url: string) => fetch(url).then(res => res.json());
+
+
+export default function Header({ onMenuClick }: HeaderProps) {
   const { data: session, status } = useSession();
   const [notifications, setNotifications] = useState<Notification[]>([]);
-
-  const isMobile = useMediaQuery("(max-width: 768px)");
-  const [balance, setBalance] = useState<number | null>(null); 
-  const [loadingBalance, setLoadingBalance] = useState(true); 
+  const isMobile = useMediaQuery("(max-width: 768px)") as boolean;
+  const [loadingUser, setLoadingUser] = useState(true);
   const [userData, setUserData] = useState<UserData | null>(null);
-  const [isSearchOpen, setIsSearchOpen] = useState(false); // Control search modal for mobile
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -42,38 +44,29 @@ export default function Header({ onMenuClick, totalEarnings }: Readonly<HeaderPr
           if (!userResponse.ok) throw new Error('Failed to fetch user data');
           const userData = await userResponse.json();
           setUserData(userData);
-          console.log(userData);
-
-          if (userData.id) {
-            const balanceResponse = await fetch(`/api/balance?userId=${userData.id}`);
-            if (!balanceResponse.ok) throw new Error('Failed to fetch balance data');
-            const balanceData = await balanceResponse.json();
-            setBalance(balanceData.balance);
-            setLoadingBalance(false); 
-          }
         } catch (error) {
           console.error('Error fetching user data:', error);
-          setLoadingBalance(false);
+        } finally {
+          setLoadingUser(false);
         }
+      } else {
+        setLoadingUser(false);
       }
     };
 
     if (status === 'authenticated') {
       fetchUserData();
     } else {
-      setLoadingBalance(false);
+      setLoadingUser(false);
     }
-
-    const handleBalanceUpdate = (event: CustomEvent) => {
-      setBalance(event.detail);
-    };
-
-    window.addEventListener('balanceUpdated', handleBalanceUpdate as EventListener);
-
-    return () => {
-      window.removeEventListener('balanceUpdated', handleBalanceUpdate as EventListener);
-    };
   }, [session, status]);
+
+  const balanceKey = userData?.id ? `/api/balance?userId=${userData.id}` : null;
+
+  const { data: balanceData, error, mutate } = useSWR(
+    balanceKey,
+    fetcher
+  );
 
   useEffect(() => {
     const fetchNotifications = async () => {
@@ -123,7 +116,7 @@ export default function Header({ onMenuClick, totalEarnings }: Readonly<HeaderPr
       <div className="flex items-center justify-between px-4 py-2">
         <div className="flex items-center">
           <Button variant="ghost" size="icon" className="mr-2 md:mr-4" onClick={onMenuClick}>
-            <Menu className="h-6 w-6" />  
+            <Menu className="h-6 w-6" />
           </Button>
           <Link href="/" className="flex items-center">
             <Leaf className="h-6 w-6 md:h-8 md:w-8 text-green-500 mr-1 md:mr-2" />
@@ -144,31 +137,12 @@ export default function Header({ onMenuClick, totalEarnings }: Readonly<HeaderPr
             </div>
           </div>
         )}
+
         <div className="flex items-center">
           {isMobile && (
-            <>
-              <Button variant="ghost" size="icon" className="mr-2" onClick={() => setIsSearchOpen(true)}>
-                <Search className="h-5 w-5" />
-              </Button>
-              {/* Mobile search modal */}
-              {isSearchOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-                  <div className="bg-white p-4 w-full max-w-md mx-4 rounded-lg relative">
-                    <Button variant="ghost" size="icon" className="absolute top-2 right-2" onClick={() => setIsSearchOpen(false)}>
-                      <X className="h-5 w-5" />
-                    </Button>
-                    <div className="relative">
-                      <input
-                        type="text"
-                        placeholder="Search..."
-                        className="w-full px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-green-500"
-                      />
-                      <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                    </div>
-                  </div>
-                </div>
-              )}
-            </>
+            <Button variant="ghost" size="icon" className="mr-2">
+              <Search className="h-5 w-5" />
+            </Button>
           )}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -204,14 +178,18 @@ export default function Header({ onMenuClick, totalEarnings }: Readonly<HeaderPr
             <span className="font-semibold text-sm md:text-base text-gray-800">
               {status !== 'authenticated' ? (
                 "0.00"
-              ) : loadingBalance ? (
+              ) : !balanceData ? (
                 <Spinner className="animate-spin h-5 w-5 text-green-500" />
               ) : (
-                balance?.toFixed(2)
+                balanceData.balance.toFixed(2)
               )}
             </span>
           </div>
-          {status !== 'authenticated' ? (
+          {loadingUser ? (
+            <Button className="bg-gray-200 text-gray-600 text-sm md:text-base cursor-default" disabled>
+              Loading...
+            </Button>
+          ) : status !== 'authenticated' ? (
             <Button onClick={handleLogin} className="bg-green-600 hover:bg-green-700 text-white text-sm md:text-base">
               Login
               <LogIn className="ml-1 md:ml-2 h-4 w-4 md:h-5 md:w-5" />
@@ -226,7 +204,7 @@ export default function Header({ onMenuClick, totalEarnings }: Readonly<HeaderPr
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuItem>
-                  {session.user?.name ?? "User"}
+                  {session.user?.name || "User"}
                 </DropdownMenuItem>
                 <DropdownMenuItem>
                   <Link href="/settings">Profile</Link>
