@@ -1,7 +1,7 @@
 'use client';
+
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from 'next/navigation';
 import { useSession, signIn, signOut } from 'next-auth/react';
 import { Button } from "@/components/ui/button";
 import { Menu, Coins, Leaf, Search, Bell, User, ChevronDown, LogIn, Loader as Spinner } from "lucide-react";
@@ -9,6 +9,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Badge } from "@/components/ui/badge";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import useSWR from 'swr';
+import axios from 'axios';
 
 interface Notification {
   id: number;
@@ -23,17 +24,15 @@ interface UserData {
 
 interface HeaderProps {
   onMenuClick: () => void;
-  totalEarnings: number; // Add this line
+  totalEarnings: number;
 }
-
 
 const fetcher = (url: string) => fetch(url).then(res => res.json());
 
-
-export default function Header({ onMenuClick, totalEarnings }: HeaderProps) {
+export default function Header({ onMenuClick, totalEarnings }: Readonly<HeaderProps>) {
   const { data: session, status } = useSession();
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  const isMobile = useMediaQuery("(max-width: 768px)") as boolean;
+  const isMobile = useMediaQuery("(max-width: 768px)");
   const [loadingUser, setLoadingUser] = useState(true);
   const [userData, setUserData] = useState<UserData | null>(null);
 
@@ -65,22 +64,19 @@ export default function Header({ onMenuClick, totalEarnings }: HeaderProps) {
 
   const balanceKey = userData?.id ? `/api/balance?userId=${userData.id}` : null;
 
-  const { data: balanceData, error, mutate } = useSWR(
-    balanceKey,
-    fetcher
-  );
+  const { data: balanceData, error } = useSWR(balanceKey, fetcher);
 
   useEffect(() => {
+    if (!userData?.id) return;
+
     const fetchNotifications = async () => {
-      if (userData?.id) {
-        try {
-          const response = await fetch(`/api/notifications/unread?userId=${userData.id}`);
-          if (!response.ok) throw new Error('Failed to fetch notifications');
-          const data = await response.json();
-          setNotifications(data);
-        } catch (error) {
-          console.error("Error fetching notifications:", error);
-        }
+      try {
+        const response = await axios.get(`/api/notifications/unread`, {
+          params: { userId: userData.id },
+        });
+        setNotifications(response.data);
+      } catch (error) {
+        console.error("Error fetching notifications:", error);
       }
     };
 
@@ -101,15 +97,64 @@ export default function Header({ onMenuClick, totalEarnings }: HeaderProps) {
 
   const handleNotificationClick = async (notificationId: number) => {
     try {
-      const response = await fetch(`/api/notifications/mark-read/${notificationId}`, {
-        method: 'PUT'
-      });
-      if (!response.ok) throw new Error('Failed to mark notification as read');
+      await axios.post(`/api/notifications/markread`, { notificationId });
       setNotifications(prevNotifications =>
         prevNotifications.filter(notification => notification.id !== notificationId)
       );
     } catch (error) {
       console.error("Error marking notification as read:", error);
+    }
+  };
+
+  // Function to render the balance
+  const renderBalance = () => {
+    if (status !== 'authenticated') {
+      return "0.00";
+    } else if (error) {
+      return <span>Error loading balance</span>;
+    } else if (!balanceData) {
+      return <Spinner className="animate-spin h-5 w-5 text-green-500" />;
+    } else {
+      return balanceData.balance.toFixed(2);
+    }
+  };
+
+  // Function to render user actions
+  const renderUserActions = () => {
+    if (loadingUser) {
+      return (
+        <Button className="bg-gray-200 text-gray-600 text-sm md:text-base cursor-default" disabled>
+          Loading...
+        </Button>
+      );
+    } else if (status !== 'authenticated') {
+      return (
+        <Button onClick={handleLogin} className="bg-green-600 hover:bg-green-700 text-white text-sm md:text-base">
+          Login
+          <LogIn className="ml-1 md:ml-2 h-4 w-4 md:h-5 md:w-5" />
+        </Button>
+      );
+    } else {
+      return (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon" className="flex items-center">
+              <User className="h-5 w-5 mr-1" />
+              <ChevronDown className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem>
+              {session.user?.name ?? "User"}
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <Link href="/settings">Profile</Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem>Settings</DropdownMenuItem>
+            <DropdownMenuItem onClick={handleLogout}>Sign Out</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      );
     }
   };
 
@@ -178,44 +223,10 @@ export default function Header({ onMenuClick, totalEarnings }: HeaderProps) {
           <div className="mr-2 md:mr-4 flex items-center bg-gray-100 rounded-full px-2 md:px-3 py-1">
             <Coins className="h-4 w-4 md:h-5 md:w-5 mr-1 text-green-500" />
             <span className="font-semibold text-sm md:text-base text-gray-800">
-              {status !== 'authenticated' ? (
-                "0.00"
-              ) : !balanceData ? (
-                <Spinner className="animate-spin h-5 w-5 text-green-500" />
-              ) : (
-                balanceData.balance.toFixed(2)
-              )}
+              {renderBalance()}
             </span>
           </div>
-          {loadingUser ? (
-            <Button className="bg-gray-200 text-gray-600 text-sm md:text-base cursor-default" disabled>
-              Loading...
-            </Button>
-          ) : status !== 'authenticated' ? (
-            <Button onClick={handleLogin} className="bg-green-600 hover:bg-green-700 text-white text-sm md:text-base">
-              Login
-              <LogIn className="ml-1 md:ml-2 h-4 w-4 md:h-5 md:w-5" />
-            </Button>
-          ) : (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="flex items-center">
-                  <User className="h-5 w-5 mr-1" />
-                  <ChevronDown className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem>
-                  {session.user?.name || "User"}
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Link href="/settings">Profile</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem>Settings</DropdownMenuItem>
-                <DropdownMenuItem onClick={handleLogout}>Sign Out</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
+          {renderUserActions()}
         </div>
       </div>
     </header>

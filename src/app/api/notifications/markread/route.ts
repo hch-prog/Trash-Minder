@@ -1,24 +1,23 @@
 import prisma from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function PUT(request: NextRequest, response: NextResponse) {
+export async function POST(req: NextRequest) {
     try {
-        const { searchParams } = new URL(request.url);
-        const notificationId = parseInt(searchParams.get('notificationId') ?? " ")
+        const body = await req.json(); // Get the request body
+        const notificationId = body.notificationId;
 
         if (!notificationId) {
-            return NextResponse.json({ error: "Invalid notification ID" }, { status: 400 });
+            return NextResponse.json({ message: "Invalid notification ID" }, { status: 400 });
         }
 
-        const notification = await prisma.notifications.update({
+        const updatedNotification = await prisma.notifications.update({
             where: { id: notificationId },
-            data: { isRead: false },
+            data: { isRead: true },
+        });
 
-        })
-
-        return NextResponse.json({success:true,notification},{status:200})
-
+        return NextResponse.json(updatedNotification, { status: 200 });
     } catch (error) {
-        return NextResponse.json({ error }, { status: 400 })
+        console.error("Error marking notification as read:", error);
+        return NextResponse.json({ message: "Internal server error" }, { status: 500 });
     }
 }

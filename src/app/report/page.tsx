@@ -70,6 +70,16 @@ export default function ReportPage() {
     }
   }
 
+  async function createNotification(userId: number, type: string) { 
+    try {
+      const response = await axios.post('/api/notifications/create', { userId, type });
+      return response.data;
+    } catch (error) {
+      console.error('Error creating notification', error);
+    }
+  }
+  
+
   async function getUserByEmail(userEmail: string) {
     try {
       const response = await axios.post('/api/useremail', { email: userEmail });
@@ -102,7 +112,7 @@ export default function ReportPage() {
             toast.error("User not found. Please log in again.");
           }
         } else {
-          toast.error("User not logged in. Please log in.");
+          toast.error("User not logged in. Please log in to use.");
         }
       } catch (error) {
         toast.error("Failed to load user data and tasks. Please try again.");
@@ -229,6 +239,9 @@ export default function ReportPage() {
         amount: report.amount,
         createdAt: report.createdAt.split('T')[0],
       };
+
+
+    
 
       setReports([formattedReport, ...reports]);
       setNewReport({ location: '', type: '', amount: '' });

@@ -1,9 +1,12 @@
 import prisma from "@/lib/prisma";
+
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request:NextRequest) {
     try {
-        const { userId, message,type}=await request.json();
+        const { userId,type}=await request.json();
+
+        const message=`Report created ${type}`;
 
         const notificationCreate= await prisma.notifications.create({
             data:{userId, message ,type}
@@ -15,3 +18,7 @@ export async function POST(request:NextRequest) {
       
     }
 }
+
+
+
+  

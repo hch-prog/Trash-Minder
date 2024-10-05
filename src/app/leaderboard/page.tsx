@@ -107,7 +107,18 @@ export default function LeaderboardPage() {
               </thead>
               <tbody>
                 {rewards.map((reward, index) => {
-                  const crownColor = index === 0 ? 'text-yellow-400' : index === 1 ? 'text-gray-400' : 'text-yellow-600';
+                  let crownColor: string;
+
+                  if (index === 0) {
+                    crownColor = 'text-yellow-400';
+                  } else if (index === 1) {
+                    crownColor = 'text-gray-400';
+                  } else {
+                    crownColor = 'text-yellow-600';
+                  }
+                  ;
+
+                  
 
                   return (
                     <tr key={reward.id} className={`${user && user.id === reward.userId ? 'bg-indigo-50' : ''} hover:bg-gray-50 transition-colors duration-150 ease-in-out`}>

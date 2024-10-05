@@ -1,21 +1,25 @@
 import prisma from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(request: NextRequest) {
+export async function GET(req: NextRequest) {
     try {
-        const { searchParams } = new URL(request.url);
-        const userId = parseInt(searchParams.get('userId') ?? "")
+        const { searchParams } = new URL(req.url);
+        const userId = parseInt(searchParams.get('userId') ?? "");
 
         if (!userId) {
-            return NextResponse.json({ error: "Invalid user ID" }, { status: 400 });
+            return NextResponse.json({ message: "Invalid user ID" }, { status: 400 });
         }
 
-        const find = prisma.notifications.findMany({
-            where: { userId }
-        })
+        const unreadNotifications = await prisma.notifications.findMany({
+            where: {
+                userId: userId,
+                isRead: false,
+            },
+        });
 
-        return NextResponse.json({ success: true, find }, { status: 200 })
+        return NextResponse.json(unreadNotifications, { status: 200 });
     } catch (error) {
-        return NextResponse.json({ error: "Failed" }, { status: 400 })
+        console.error("Error fetching unread notifications:", error);
+        return NextResponse.json({ message: "Internal server error" }, { status: 500 });
     }
 }
