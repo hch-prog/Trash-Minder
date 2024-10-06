@@ -72,7 +72,7 @@ const getWasteCollectionTasks = async (limit: number = 20) => {
 
 async function getUserByEmail(userEmail: string) {
   try {
-    const response = await axios.post('/api/getuserbyemail', { email: userEmail });
+    const response = await axios.post('/api/useremail', { email: userEmail });
     return response.data;
   } catch (error) {
     console.error('Error fetching user by email:', error);
