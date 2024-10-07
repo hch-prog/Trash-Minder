@@ -4,25 +4,46 @@ import Image from "next/image";
 import { signIn } from "next-auth/react";
 
 export default function SignInPage() {
+  const callbackUrl = process.env.URL || 'http://localhost:3000/';
+
   return (
-    <section className="bg-white">
-      <div className="lg:grid lg:min-h-screen lg:grid-cols-12">
-        <section className="relative flex h-32 items-end bg-gray-900 lg:col-span-5 lg:h-full xl:col-span-6">
+    <section className="bg-gray-50 min-h-screen flex items-center justify-center">
+      <div className="lg:grid lg:min-h-screen lg:grid-cols-12 bg-white shadow-lg rounded-lg overflow-hidden max-w-6xl mx-auto">
+        {/* Image Section */}
+        <section className="relative hidden lg:flex items-end bg-gray-900 lg:col-span-5 xl:col-span-6">
           <Image
             alt="Background image"
             src="https://images.unsplash.com/photo-1605106702734-205df224ecce?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=870&q=80"
             className="absolute inset-0 h-full w-full object-cover opacity-80"
-            layout="fill" 
-            objectFit="cover" 
-            priority 
+            layout="fill"
+            objectFit="cover"
+            priority
           />
+          <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent"></div>
+          <div className="relative z-10 p-8">
+            <h2 className="text-4xl font-semibold text-white">
+              Welcome Back!
+            </h2>
+            <p className="mt-2 text-lg text-gray-300">
+              Sign in to access your account and manage your preferences.
+            </p>
+          </div>
         </section>
 
-        <main className="flex items-center justify-center bg-gray-200 px-8 py-8 sm:px-12 lg:col-span-7 lg:px-16 lg:py-12 xl:col-span-6">
-          <div className="max-w-xl lg:max-w-3xl">
+        {/* Form Section */}
+        <main className="flex items-center justify-center px-8 py-16 bg-white lg:col-span-7 xl:col-span-6">
+          <div className="w-full max-w-md space-y-8">
+            <div className="text-center">
+              <h2 className="text-3xl font-bold text-gray-800">
+                Sign in to Your Account
+              </h2>
+              <p className="mt-2 text-gray-600">
+                Use your Google account to get started.
+              </p>
+            </div>
             <button
-              onClick={() => signIn("google", { callbackUrl: 'http://localhost:3000/' })}
-              className="w-full py-3 text-white bg-blue-500 rounded-md shadow-md hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:outline-none flex items-center justify-center"
+              onClick={() => signIn("google", { callbackUrl })}
+              className="relative w-full py-3 text-white bg-blue-500 rounded-lg shadow-lg hover:bg-blue-600 focus:ring-2 focus:ring-blue-400 focus:outline-none transition-all duration-200 ease-in-out flex items-center justify-center"
             >
               <svg className="w-6 h-6 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                 <path
@@ -44,6 +65,19 @@ export default function SignInPage() {
               </svg>
               Sign in with Google
             </button>
+            <div className="text-center">
+              <p className="text-sm text-gray-500">
+                Don’t have an account?{' '}
+                <a
+                  href="#"
+                  onClick={() => signIn("google", { callbackUrl })}
+                  className="text-blue-500 hover:underline cursor-pointer"
+                >
+                  Sign up
+                </a>
+              </p>
+
+            </div>
           </div>
         </main>
       </div>
