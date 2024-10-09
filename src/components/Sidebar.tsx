@@ -1,6 +1,6 @@
 import Link from "next/link"
 import { usePathname } from 'next/navigation'
-import { Button } from "@/components/ui/Button"
+import { Button } from "@/components/ui/button"
 import { MapPin, Trash, Coins, Medal, Settings, Home } from "lucide-react"
 
 const sidebarItems = [

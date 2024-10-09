@@ -4,7 +4,7 @@
 import { useState, useEffect } from 'react'
 import useSWR, { mutate } from 'swr'
 import { Coins, ArrowUpRight, ArrowDownRight, Gift, AlertCircle, Loader } from 'lucide-react'
-import { Button } from '@/components/ui/Button'
+import { Button } from '@/components/ui/button'
 import { toast } from 'react-hot-toast'
 import { useSession } from 'next-auth/react'
 import axios from 'axios'

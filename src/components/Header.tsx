@@ -3,10 +3,10 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useSession, signIn, signOut } from 'next-auth/react';
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import { Menu, Coins, Leaf, Search, Bell, User, ChevronDown, LogIn, Loader as Spinner } from "lucide-react";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/Dropdown-Menu";
-import { Badge } from "@/components/ui/Badge";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Badge } from "@/components/ui/badge";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import useSWR from 'swr';
 import axios from 'axios';

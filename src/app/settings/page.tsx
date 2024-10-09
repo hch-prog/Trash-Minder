@@ -1,7 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { User, Mail, Phone, MapPin, Save, Loader } from 'lucide-react'
-import { Button } from '@/components/ui/Button'
+import { Button } from '@/components/ui/button'
 import { toast } from 'react-hot-toast'
 import { useSession } from 'next-auth/react'
 import axios from 'axios'
