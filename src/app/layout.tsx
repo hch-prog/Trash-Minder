@@ -17,11 +17,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   const [totalEarnings, setTotalEarnings] = useState(0);
   const pathname = usePathname();
 
-  // List of paths where the layout should not be applied
+ 
   const excludedPaths = ["/api/auth/signin"];
 
-  // Conditionally check if the current path should exclude the layout
-  const shouldExcludeLayout = excludedPaths.includes(pathname);
+ const shouldExcludeLayout = excludedPaths.includes(pathname);
 
   return (
     <html lang="en">

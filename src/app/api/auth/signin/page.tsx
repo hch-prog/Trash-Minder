@@ -9,7 +9,6 @@ export default function SignInPage() {
   return (
     <section className="bg-gray-50 min-h-screen flex items-center justify-center">
       <div className="lg:grid lg:min-h-screen lg:grid-cols-12 bg-white shadow-lg rounded-lg overflow-hidden max-w-6xl mx-auto">
-        {/* Image Section */}
         <section className="relative hidden lg:flex items-end bg-gray-900 lg:col-span-5 xl:col-span-6">
           <Image
             alt="Background image"
@@ -19,18 +18,20 @@ export default function SignInPage() {
             objectFit="cover"
             priority
           />
+          
+          <div className="absolute inset-0 bg-green-800 opacity-80"></div>
+
           <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent"></div>
           <div className="relative z-10 p-8">
-            <h2 className="text-4xl font-semibold text-white">
-              Welcome Back!
-            </h2>
+            <h2 className="text-4xl font-semibold text-white">Welcome Back!</h2>
             <p className="mt-2 text-lg text-gray-300">
               Sign in to access your account and manage your preferences.
             </p>
           </div>
         </section>
 
-        {/* Form Section */}
+
+
         <main className="flex items-center justify-center px-8 py-16 bg-white lg:col-span-7 xl:col-span-6">
           <div className="w-full max-w-md space-y-8">
             <div className="text-center">

@@ -1,7 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { MapPin, Upload, CheckCircle, Loader } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/ui/Button'
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import axios from 'axios';
 import { useRouter } from 'next/navigation';

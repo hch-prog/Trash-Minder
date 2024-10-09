@@ -1,7 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { ArrowRight, Leaf, Recycle, Users, Coins, MapPin } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/ui/Button'
 import { Poppins } from 'next/font/google'
 import Link from 'next/link'
 import axios from 'axios'

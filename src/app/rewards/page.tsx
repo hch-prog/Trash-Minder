@@ -4,7 +4,7 @@
 import { useState, useEffect } from 'react'
 import useSWR, { mutate } from 'swr'
 import { Coins, ArrowUpRight, ArrowDownRight, Gift, AlertCircle, Loader } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/ui/Button'
 import { toast } from 'react-hot-toast'
 import { useSession } from 'next-auth/react'
 import axios from 'axios'
@@ -83,7 +83,7 @@ export default function RewardsPage() {
     }
   }, [status, session])
 
-  // Use SWR to fetch the balance
+  
   const balanceKey = user?.id ? `/api/balance?userId=${user.id}` : null
   const { data: balanceData } = useSWR(balanceKey, fetcher)
 
@@ -99,10 +99,10 @@ export default function RewardsPage() {
         const response = await axios.post('/api/redeem', { userId: user.id, rewardId })
 
         if (response.status >= 200 && response.status < 300) {
-          // Revalidate the balance and transactions
-          mutate(balanceKey)
+          mutate(balanceKey) 
           fetchTransactions()
           toast.success(`You have successfully redeemed: ${reward.name}`)
+          setRewards(prevRewards => prevRewards.filter(r => r.id !== rewardId))
         } else {
           throw new Error('Failed to redeem reward')
         }
@@ -115,6 +115,7 @@ export default function RewardsPage() {
     }
   }
 
+
   const handleRedeemAllPoints = async () => {
     if (!user) {
       toast.error('Please log in to redeem points.')
@@ -125,13 +126,14 @@ export default function RewardsPage() {
       try {
         const response = await axios.post('/api/redeem', {
           userId: user.id,
-          rewardId: 0,
+          rewardId: 0, 
         })
 
         if (response.status >= 200 && response.status < 300) {
-          mutate(balanceKey)
-          fetchTransactions()
+          mutate(balanceKey) 
+          fetchTransactions() 
           toast.success(`You have successfully redeemed all your points!`)
+          setRewards([])
         } else {
           throw new Error('Failed to redeem all points')
         }
@@ -143,6 +145,7 @@ export default function RewardsPage() {
       toast.error('No points available to redeem')
     }
   }
+
 
   const fetchTransactions = async () => {
     if (user) {
@@ -211,9 +214,8 @@ export default function RewardsPage() {
                     </div>
                   </div>
                   <span
-                    className={`font-semibold ${
-                      transaction.type.startsWith('earned') ? 'text-green-500' : 'text-red-500'
-                    }`}
+                    className={`font-semibold ${transaction.type.startsWith('earned') ? 'text-green-500' : 'text-red-500'
+                      }`}
                   >
                     {transaction.type.startsWith('earned') ? '+' : '-'}
                     {transaction.amount}
@@ -229,7 +231,7 @@ export default function RewardsPage() {
         <div>
           <h2 className="text-2xl font-semibold mb-4 text-gray-800">Available Rewards</h2>
           <div className="space-y-4">
-            {rewards.length > 0 ? (
+            {rewards.length > 0 ? ( 
               rewards.map(reward => (
                 <div key={reward.id} className="bg-white p-4 rounded-xl shadow-md">
                   <div className="flex justify-between items-center mb-2">

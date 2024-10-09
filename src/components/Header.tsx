@@ -3,10 +3,10 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useSession, signIn, signOut } from 'next-auth/react';
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import { Menu, Coins, Leaf, Search, Bell, User, ChevronDown, LogIn, Loader as Spinner } from "lucide-react";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Badge } from "@/components/ui/badge";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/Dropdown-Menu";
+import { Badge } from "@/components/ui/Badge";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import useSWR from 'swr';
 import axios from 'axios';
@@ -106,7 +106,6 @@ export default function Header({ onMenuClick, totalEarnings }: Readonly<HeaderPr
     }
   };
 
-  // Function to render the balance
   const renderBalance = () => {
     if (status !== 'authenticated') {
       return "0.00";
@@ -119,7 +118,7 @@ export default function Header({ onMenuClick, totalEarnings }: Readonly<HeaderPr
     }
   };
 
-  // Function to render user actions
+
   const renderUserActions = () => {
     if (loadingUser) {
       return (
@@ -129,10 +128,14 @@ export default function Header({ onMenuClick, totalEarnings }: Readonly<HeaderPr
       );
     } else if (status !== 'authenticated') {
       return (
-        <Button onClick={handleLogin} className="bg-green-600 hover:bg-green-700 text-white text-sm md:text-base">
+        <Button
+          onClick={handleLogin}
+          className="bg-green-600 hover:bg-green-700 text-white text-sm md:text-base md:hidden" 
+        >
           Login
           <LogIn className="ml-1 md:ml-2 h-4 w-4 md:h-5 md:w-5" />
         </Button>
+
       );
     } else {
       return (
