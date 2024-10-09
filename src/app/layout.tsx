@@ -11,16 +11,13 @@ import { usePathname } from "next/navigation";
 
 const inter = Inter({ subsets: ["latin"] });
 
-
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [totalEarnings, setTotalEarnings] = useState(0);
   const pathname = usePathname();
 
- 
   const excludedPaths = ["/api/auth/signin"];
 
- const shouldExcludeLayout = excludedPaths.includes(pathname);
+  const shouldExcludeLayout = excludedPaths.includes(pathname);
 
   return (
     <html lang="en">
@@ -28,7 +25,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <body className={inter.className}>
           {!shouldExcludeLayout ? (
             <div className="min-h-screen bg-gray-50 flex flex-col">
-              <Header onMenuClick={() => setSidebarOpen(!sidebarOpen)} totalEarnings={totalEarnings} />
+              <Header onMenuClick={() => setSidebarOpen(!sidebarOpen)} /> {/* Passing totalEarnings */}
               <div className="flex flex-1">
                 <Sidebar open={sidebarOpen} />
                 <main className="flex-1 p-4 lg:p-8 ml-0 lg:ml-64 transition-all duration-300">
@@ -36,7 +33,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
                 </main>
               </div>
             </div>
-          ) : (          
+          ) : (
             <>{children}</>
           )}
           <Toaster />

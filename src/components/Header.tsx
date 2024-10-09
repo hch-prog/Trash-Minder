@@ -24,12 +24,11 @@ interface UserData {
 
 interface HeaderProps {
   onMenuClick: () => void;
-  totalEarnings: number;
 }
 
 const fetcher = (url: string) => fetch(url).then(res => res.json());
 
-export default function Header({ onMenuClick, totalEarnings }: Readonly<HeaderProps>) {
+export default function Header({ onMenuClick }: Readonly<HeaderProps>) {
   const { data: session, status } = useSession();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const isMobile = useMediaQuery("(max-width: 768px)");
