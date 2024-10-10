@@ -1,5 +1,3 @@
-
-// app/api/redeem/route.ts
 import { NextResponse } from 'next/server'
 import { PrismaClient } from '@prisma/client'
 
@@ -23,7 +21,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 })
     }
 
-    // Calculate user's current balance
     const transactions = await prisma.transactions.findMany({
       where: { userId: user.id },
     })
@@ -33,7 +30,6 @@ export async function POST(request: Request) {
     }, 0)
 
     if (rewardId === 0) {
-      // Redeem all points
       if (userBalance <= 0) {
         return NextResponse.json({ error: 'No points available to redeem' }, { status: 400 })
       }
@@ -49,7 +45,6 @@ export async function POST(request: Request) {
 
       return NextResponse.json({ message: 'All points redeemed successfully' })
     } else {
-      // Redeem specific reward
       const reward = await prisma.reward.findUnique({
         where: { id: rewardId },
       })

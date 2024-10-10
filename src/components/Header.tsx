@@ -119,24 +119,17 @@ export default function Header({ onMenuClick }: Readonly<HeaderProps>) {
 
 
   const renderUserActions = () => {
-    if (loadingUser) {
-      return (
-        <Button className="bg-gray-200 text-gray-600 text-sm md:text-base cursor-default" disabled>
-          Loading...
-        </Button>
-      );
-    } else if (status !== 'authenticated') {
+    if (status === 'unauthenticated'){
       return (
         <Button
           onClick={handleLogin}
-          className="bg-green-600 hover:bg-green-700 text-white text-sm md:text-base md:hidden" 
+          className="bg-green-600 hover:bg-green-700 text-white text-sm md:text-base"
         >
           Login
           <LogIn className="ml-1 md:ml-2 h-4 w-4 md:h-5 md:w-5" />
         </Button>
-
       );
-    } else {
+    } else if (status === 'authenticated' && session) {
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -157,8 +150,15 @@ export default function Header({ onMenuClick }: Readonly<HeaderProps>) {
           </DropdownMenuContent>
         </DropdownMenu>
       );
+    } else {
+      return (
+        <Button className="bg-gray-200 text-gray-600 text-sm md:text-base cursor-default" disabled>
+          Loading...
+        </Button>
+      );
     }
   };
+  
 
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-50">

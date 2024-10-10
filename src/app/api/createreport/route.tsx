@@ -13,8 +13,8 @@ async function createTransaction(userId: number, type: string, amount: number, d
       description,
     });
 
-    if (response.status === 200) {  // Check for success via status code, not `ok`
-      console.log('Transaction created:', response.data);  // Use `response.data` to access the parsed data
+    if (response.status === 200) {  
+      console.log('Transaction created:', response.data); 
       return response.data;
     } else {
       console.error('Failed to create transaction:', response.data.error);

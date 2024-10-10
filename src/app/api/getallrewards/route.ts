@@ -7,10 +7,10 @@ import { NextResponse } from 'next/server';
 export async function GET() {
   try {
     const rewards = await prisma.reward.findMany({
-      orderBy: { points: 'desc' }, // Order by points in descending order
+      orderBy: { points: 'desc' },
       include: {
         user: {
-          select: { name: true }, // Include user name
+          select: { name: true }, 
         },
       },
     });
