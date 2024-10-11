@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
-  title: "Trash Minder",
+  title: "Translytic",
   description: "AI-powered trash minder",
 }

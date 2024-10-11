@@ -2,12 +2,11 @@
 import { useState, useEffect } from 'react'
 import { Trash2, MapPin, CheckCircle, Clock, Upload, Loader, Calendar, Weight, Search } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { toast } from 'react-hot-toast'
-
 import { GoogleGenerativeAI } from "@google/generative-ai"
 import axios from 'axios'
 import { useSession } from 'next-auth/react'
+import { Input } from '@/components/ui/input'
 
 
 const geminiApiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY
@@ -84,7 +83,6 @@ export default function CollectPage() {
           toast.error("User not logged in. Please log in.");
         }
 
-        // Fetch tasks
         const fetchedTasks = await getWasteCollectionTasks();
         setTasks(fetchedTasks as CollectionTask[]);
       } catch (error) {
@@ -219,7 +217,7 @@ export default function CollectPage() {
         }`
 
       const result = await model.generateContent([prompt, ...imageParts])
-      const response = await result.response
+      const response = result.response
       const text = response.text()
 
       try {
@@ -430,18 +428,11 @@ export default function CollectPage() {
           </div>
         </div>
       )}
-
-      {/* Add a conditional render to show user info or login prompt */}
-      {/* {user ? (
-        <p className="text-sm text-gray-600 mb-4">Logged in as: {user.name}</p>
-      ) : (
-        <p className="text-sm text-red-600 mb-4">Please log in to collect waste and earn rewards.</p>
-      )} */}
     </div>
   )
 }
 
-function StatusBadge({ status }: { status: CollectionTask['status'] }) {
+function StatusBadge({ status }: Readonly<{ status: CollectionTask['status'] }>) {
   const statusConfig = {
     pending: { color: 'bg-yellow-100 text-yellow-800', icon: Clock },
     in_progress: { color: 'bg-blue-100 text-blue-800', icon: Trash2 },

@@ -24,12 +24,11 @@ interface UserData {
 
 interface HeaderProps {
   onMenuClick: () => void;
-  totalEarnings: number;
 }
 
 const fetcher = (url: string) => fetch(url).then(res => res.json());
 
-export default function Header({ onMenuClick, totalEarnings }: Readonly<HeaderProps>) {
+export default function Header({ onMenuClick }: Readonly<HeaderProps>) {
   const { data: session, status } = useSession();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const isMobile = useMediaQuery("(max-width: 768px)");
@@ -106,7 +105,6 @@ export default function Header({ onMenuClick, totalEarnings }: Readonly<HeaderPr
     }
   };
 
-  // Function to render the balance
   const renderBalance = () => {
     if (status !== 'authenticated') {
       return "0.00";
@@ -119,22 +117,19 @@ export default function Header({ onMenuClick, totalEarnings }: Readonly<HeaderPr
     }
   };
 
-  // Function to render user actions
+
   const renderUserActions = () => {
-    if (loadingUser) {
+    if (status === 'unauthenticated'){
       return (
-        <Button className="bg-gray-200 text-gray-600 text-sm md:text-base cursor-default" disabled>
-          Loading...
-        </Button>
-      );
-    } else if (status !== 'authenticated') {
-      return (
-        <Button onClick={handleLogin} className="bg-green-600 hover:bg-green-700 text-white text-sm md:text-base">
+        <Button
+          onClick={handleLogin}
+          className="bg-green-600 hover:bg-green-700 text-white text-sm md:text-base"
+        >
           Login
           <LogIn className="ml-1 md:ml-2 h-4 w-4 md:h-5 md:w-5" />
         </Button>
       );
-    } else {
+    } else if (status === 'authenticated' && session) {
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -155,8 +150,15 @@ export default function Header({ onMenuClick, totalEarnings }: Readonly<HeaderPr
           </DropdownMenuContent>
         </DropdownMenu>
       );
+    } else {
+      return (
+        <Button className="bg-gray-200 text-gray-600 text-sm md:text-base cursor-default" disabled>
+          Loading...
+        </Button>
+      );
     }
   };
+  
 
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-50">

@@ -23,8 +23,7 @@ export async function POST(request: Request) {
     if (!userId || typeof amount !== 'number') {
       return NextResponse.json({ error: 'Invalid input data' }, { status: 400 });
     }
-
-    // Create the reward
+    
     const reward = await prisma.reward.create({
       data: {
         userId,

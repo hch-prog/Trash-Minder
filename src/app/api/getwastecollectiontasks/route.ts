@@ -10,7 +10,7 @@ export async function GET(request:NextRequest){
             take:limit,
             orderBy: {createdAt:'desc'},
         });
-         //@ts-ignore 
+
         const formattedTasks = tasks.map((task) => ({
             ...task,
             date: task.createdAt.toISOString().split('T')[0],
